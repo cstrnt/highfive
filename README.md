@@ -2,9 +2,9 @@
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
-
 ## Getting Started
 
+`docker-compose up -d`
 `pnpm i`
 `pnpm db:push`
 `pnpm dev`
