@@ -100,7 +100,7 @@ export function QuestionComponent({
     <Card
       id={question.id}
       ref={cardRef}
-      className="relative max-w-lg transition duration-200 ease-in-out data-[active=false]:cursor-default data-[active=false]:opacity-30 data-[active=false]:shadow-none data-[active=false]:grayscale"
+      className="relative max-w-lg transition duration-200 ease-in-out data-[active=false]:cursor-default data-[active=false]:opacity-30 data-[active=false]:shadow-none data-[active=false]:grayscale hover:data-[active=false]:opacity-60"
       data-active={isActive}
       onClick={() => {
         if (onCardClick) onCardClick(cardRef);
