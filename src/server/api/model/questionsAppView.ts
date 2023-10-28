@@ -1,7 +1,7 @@
-import { type QuestionType } from "~/lib/types";
+import { type QuestionType } from "@prisma/client";
 
 export type QuestionsAppView = {
-    id: string,
-    text: string,
-    type: QuestionType,
-}
+  id: string;
+  text: string;
+  type: QuestionType;
+};

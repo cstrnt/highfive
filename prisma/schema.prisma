@@ -11,6 +11,13 @@ datasource db {
     directUrl = env("DATABASE_URL_NON_POOLING") // uses a direct connection
 }
 
+enum QuestionType {
+    TEXT
+    NUMBER
+    DATE
+    BOOLEAN
+}
+
 model Post {
     id        Int      @id @default(autoincrement())
     name      String
@@ -95,7 +102,7 @@ model UserAnswers {
 model Question {
     id              String         @id @default(cuid())
     question_textId String
-    answer_type     String
+    answer_type     QuestionType
     form            QuestionForm[]
     UserAnswers     UserAnswers[]
 }

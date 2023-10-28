@@ -14,7 +14,7 @@ import {
 import { Input } from "../ui/input";
 import { ChoiceQuestion } from "./ChoiceQuestion";
 import { DatePicker } from "../DatePicker";
-import { QuestionType, type Question } from "~/lib/types";
+import { type Question } from "~/lib/types";
 import { QuestionMarkCircledIcon, ReloadIcon } from "@radix-ui/react-icons";
 import {
   TooltipProvider,
@@ -43,7 +43,7 @@ export function QuestionComponent({
 
   const cardContent = () => {
     switch (question.type) {
-      case QuestionType.Text: {
+      case "TEXT": {
         return (
           <Input
             type="text"
@@ -55,7 +55,7 @@ export function QuestionComponent({
           />
         );
       }
-      case QuestionType.Number: {
+      case "NUMBER": {
         return (
           <Input
             type="number"
@@ -67,12 +67,12 @@ export function QuestionComponent({
           />
         );
       }
-      case QuestionType.Date: {
+      case "DATE": {
         return (
           <DatePicker value={value as Date | undefined} onChange={setValue} />
         );
       }
-      case QuestionType.Choice: {
+      case "BOOLEAN": {
         return (
           <ChoiceQuestion
             question={question}
@@ -89,7 +89,7 @@ export function QuestionComponent({
     setIsSubmitting(true);
     let stringifiedValue: string | undefined = undefined;
 
-    if (question.type === QuestionType.Date) {
+    if (question.type === "DATE") {
       stringifiedValue = (value as Date)?.toISOString();
     } else {
       stringifiedValue = value !== undefined ? String(value) : undefined;
@@ -114,7 +114,7 @@ export function QuestionComponent({
           {question.isRequired && <span className="text-primary">*</span>}
         </CardTitle>
         {question.helpText && (
-          <div className="text-muted-foreground absolute right-4 top-2">
+          <div className="absolute right-4 top-2 text-muted-foreground">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -122,7 +122,7 @@ export function QuestionComponent({
                 </TooltipTrigger>
                 <TooltipContent
                   side="bottom"
-                  className="bg-muted text-muted-foreground max-w-xs"
+                  className="max-w-xs bg-muted text-muted-foreground"
                 >
                   <p>{question.helpText}</p>
                 </TooltipContent>
