@@ -94,7 +94,7 @@ model UserAnswers {
 
 model Question {
     id          String         @id @default(cuid())
-    name_textId String
+    question_textId String
     answer_type String
     form        QuestionForm[]
     UserAnswers UserAnswers[]
