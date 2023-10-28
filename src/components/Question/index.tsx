@@ -30,7 +30,7 @@ export function QuestionComponent({
   onCardClick,
 }: {
   question: Question;
-  onContinue: () => void | Promise<void>;
+  onContinue: (value: string | undefined) => void | Promise<void>;
   isActive: boolean;
   onCardClick?: (ref: RefObject<HTMLDivElement>) => void;
 }) {
@@ -85,7 +85,14 @@ export function QuestionComponent({
 
   const onContinueClick = async () => {
     setIsSubmitting(true);
-    await onContinue();
+    let stringifiedValue: string | undefined = undefined;
+
+    if (question.type === QuestionType.Date) {
+      stringifiedValue = (value as Date)?.toISOString();
+    } else {
+      stringifiedValue = value !== undefined ? String(value) : undefined;
+    }
+    await onContinue(stringifiedValue);
     setIsSubmitting(false);
   };
 
@@ -93,15 +100,10 @@ export function QuestionComponent({
     <Card
       id={question.id}
       ref={cardRef}
-      className="relative max-w-lg transition duration-200 ease-in-out data-[active=false]:cursor-default data-[active=false]:opacity-30 data-[active=false]:shadow-none data-[active=false]:grayscale"
+      className="relative max-w-lg transition duration-200 ease-in-out data-[active=false]:cursor-default data-[active=false]:opacity-30 data-[active=false]:shadow-none data-[active=false]:grayscale hover:data-[active=false]:opacity-60"
       data-active={isActive}
       onClick={() => {
         if (onCardClick) onCardClick(cardRef);
-      }}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          void onContinueClick();
-        }
       }}
     >
       <CardHeader>

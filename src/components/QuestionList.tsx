@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { type Question } from "~/lib/types";
 import { QuestionComponent } from "./Question";
+import { api } from "~/trpc/react";
 
 export function QuestionList({
   questions,
@@ -11,6 +12,7 @@ export function QuestionList({
   questions: Question[];
   lastQuestionId?: string;
 }) {
+  const updateQuestion = api.question.updateQuestion.useMutation();
   const questionStack = questions;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(
     lastQuestionId
@@ -18,14 +20,20 @@ export function QuestionList({
       : 0,
   );
 
-  const onSubmit = async (index: number) => {
+  const currentQuestion = questionStack.at(currentQuestionIndex);
+
+  if (!currentQuestion) return null;
+
+  const onSubmit = async (value: string | undefined, index: number) => {
     const nextCard = questionStack.at(index + 1);
     if (!nextCard) return;
     const nextCardDomNode = document.getElementById(nextCard.id);
     if (!nextCardDomNode) return;
 
-    // TODO: mock loading
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await updateQuestion.mutateAsync({
+      id: currentQuestion.id,
+      answer: value,
+    });
 
     nextCardDomNode.scrollIntoView({
       behavior: "smooth",
@@ -41,7 +49,7 @@ export function QuestionList({
         <QuestionComponent
           key={question.id}
           question={question}
-          onContinue={() => onSubmit(i)}
+          onContinue={(value) => onSubmit(value, i)}
           onCardClick={(cardRef) => {
             if (i === currentQuestionIndex) return;
             if (!cardRef.current) return;
