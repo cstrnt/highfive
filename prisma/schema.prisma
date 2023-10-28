@@ -79,6 +79,7 @@ model TextTranslation {
     id       String @id @default(cuid())
     textId   String
     language String
+    translation String
     text     Text  @relation(fields: [textId], references: [id], onDelete: Cascade)
 }
 
