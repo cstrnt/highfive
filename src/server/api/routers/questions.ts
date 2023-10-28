@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { QuestionsAppView } from "../model/questionsAppView";
 
 export const questionRouter = createTRPCRouter({
   getQuestions: protectedProcedure
@@ -32,6 +33,40 @@ export const questionRouter = createTRPCRouter({
         },
         take: 1,
       });
+
+      const questionsAppView = new Array<QuestionsAppView>(questions.length);
+
+      let i = 0;
+      for (const question of questions) {
+        const dbQuestion = await ctx.db.question.findFirstOrThrow({
+          where: {
+            id: question.questionId,
+          },
+        });
+
+        const dbText = await ctx.db.text.findFirstOrThrow({
+          where: {
+            id: dbQuestion.question_textId,
+          },
+        });
+
+        const dbTextTranslation = await ctx.db.textTranslation.findFirstOrThrow(
+          {
+            where: {
+              textId: dbText.id,
+              language: input.language,
+            },
+          },
+        );
+
+        const questionAppView: QuestionsAppView = {
+          id: question.id,
+          text: dbTextTranslation.translation,
+          type: dbQuestion.answer_type,
+        };
+
+        questionsAppView[i++] = questionAppView;
+      }
 
       return { questions, initialQuestionId: lastQuestionId[0]?.id };
     }),
