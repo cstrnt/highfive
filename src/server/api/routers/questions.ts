@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { QuestionsAppView } from "../model/questionsAppView";
+import type { QuestionsAppView } from "../model/questionsAppView";
 
 export const questionRouter = createTRPCRouter({
   getQuestions: protectedProcedure
