@@ -1,48 +1,60 @@
-import { Prisma, PrismaClient } from "@prisma/client";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const questionRouter = createTRPCRouter({
   getQuestions: protectedProcedure
-    .input(z.object({ formId: z.string(), userId: z.string(), language: z.string() }))
+    .input(
+      z.object({
+        formId: z.string(),
+        language: z.string(),
+      }),
+    )
     .query(async ({ input, ctx }) => {
-      // get questions from db for the given id (fragebogen id / formularId
-      // return questions
-
       const questions = await ctx.db.questionForm.findMany({
         where: {
-          formId: input.formId
+          formId: input.formId,
         },
-      })
-      const lastQuestionId = await ctx.db.userAnswers.findMany(
-        {
-          where: {
-            userId: input.userId, questionId: {
-              in: questions.map(question => question.questionId)
-            }
-          }
-        }
-      )
+        include: {
+          question: true,
+        },
+      });
 
-      return { questions, lastQuestionId };
+      const lastQuestionId = await ctx.db.userAnswers.findMany({
+        where: {
+          userId: ctx.session.user.id,
+          questionId: {
+            in: questions.map((question) => question.questionId),
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1,
+      });
+
+      return { questions, initialQuestionId: lastQuestionId[0]?.id };
     }),
   updateQuestion: protectedProcedure
-    .input(z.object({ questionId: z.string(), userId: z.string(), answer: z.string().optional() }))
+    .input(
+      z.object({
+        questionId: z.string(),
+        answer: z.string().optional(),
+      }),
+    )
     .mutation(async ({ input, ctx }) => {
-      
       const question = await ctx.db.questionForm.findUnique({
         where: {
-          id: input.questionId
-        }
+          id: input.questionId,
+        },
       });
       if (!question) {
         throw new Error("question not found");
       }
       const user = await ctx.db.user.findUnique({
         where: {
-          id: input.userId
-        }
+          id: ctx.session.user.id,
+        },
       });
       if (!user) {
         throw new Error("user not found");
@@ -54,11 +66,10 @@ export const questionRouter = createTRPCRouter({
       const answer = await ctx.db.userAnswers.create({
         data: {
           questionId: input.questionId,
-          userId: input.userId,
-          answer: input.answer
-        }
+          userId: ctx.session.user.id,
+          answer: input.answer,
+        },
       });
-
 
       return { answer };
     }),

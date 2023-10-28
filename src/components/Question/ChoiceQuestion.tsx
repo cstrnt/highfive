@@ -28,7 +28,7 @@ export function ChoiceQuestion<
           />
           <Label
             htmlFor={choice.value}
-            className="border-muted bg-popover hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary flex h-full flex-col items-center justify-center rounded-md border-2 p-4"
+            className="border-muted bg-popover hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary flex h-full flex-col items-center justify-center rounded-md border-2 p-4 text-center"
           >
             {choice.label}
           </Label>

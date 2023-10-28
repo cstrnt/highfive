@@ -1,10 +1,14 @@
 import "~/styles/globals.css";
 
-import { GeistSans, GeistMono } from "geist/font";
-
+import { Open_Sans } from "next/font/google";
 import { headers } from "next/headers";
-
 import { TRPCReactProvider } from "~/trpc/react";
+
+const openSans = Open_Sans({
+  subsets: ["latin-ext"],
+  display: "swap",
+  variable: "--font-open-sans"
+});
 
 export const metadata = {
   title: "Create T3 App",
@@ -20,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${GeistSans.variable} ${GeistMono.variable} bg-background min-h-screen font-sans antialiased`}
+        className={`${openSans.variable} bg-background min-h-screen font-sans antialiased`}
       >
         <TRPCReactProvider headers={headers()}>{children}</TRPCReactProvider>
       </body>

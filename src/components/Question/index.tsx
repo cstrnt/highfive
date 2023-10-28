@@ -51,6 +51,7 @@ export function QuestionComponent({
             onChange={(e) => setValue(e.target.value)}
             minLength={question.minLength}
             maxLength={question.maxLength}
+            className="py-6"
           />
         );
       }
@@ -62,6 +63,7 @@ export function QuestionComponent({
             onChange={(e) => setValue(e.target.valueAsNumber)}
             min={question.minValue}
             max={question.maxValue}
+            className="py-6"
           />
         );
       }
@@ -100,7 +102,7 @@ export function QuestionComponent({
     <Card
       id={question.id}
       ref={cardRef}
-      className="relative max-w-lg transition duration-200 ease-in-out data-[active=false]:cursor-default data-[active=false]:opacity-30 data-[active=false]:shadow-none data-[active=false]:grayscale hover:data-[active=false]:opacity-60"
+      className="relative transition duration-200 ease-in-out data-[active=false]:cursor-default data-[active=false]:opacity-30 data-[active=false]:shadow-none data-[active=false]:grayscale hover:data-[active=false]:opacity-60"
       data-active={isActive}
       onClick={() => {
         if (onCardClick) onCardClick(cardRef);
@@ -132,7 +134,11 @@ export function QuestionComponent({
       </CardHeader>
       <CardContent>{cardContent()}</CardContent>
       <CardFooter className="flex justify-end">
-        <Button onClick={onContinueClick} disabled={isSubmitting}>
+        <Button
+          onClick={onContinueClick}
+          disabled={isSubmitting}
+          className="text-base font-semibold"
+        >
           {isSubmitting && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
           Weiter
         </Button>
