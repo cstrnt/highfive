@@ -1,12 +1,11 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { z } from "zod";
-import { QUESTIONS } from "~/lib/data";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const questionRouter = createTRPCRouter({
   getQuestions: protectedProcedure
-    .input(z.object({ formId: z.string(), userId: z.string() }))
+    .input(z.object({ formId: z.string(), userId: z.string(), language: z.string() }))
     .query(async ({ input, ctx }) => {
       // get questions from db for the given id (fragebogen id / formularId
       // return questions
