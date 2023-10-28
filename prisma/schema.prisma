@@ -68,3 +68,47 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
+
+model Text {
+    id      String @id @default(cuid())
+    context String
+    textTranslation TextTranslation[]
+}
+
+model TextTranslation {
+    id       String @id @default(cuid())
+    textId   String
+    language String
+    text     Text  @relation(fields: [textId], references: [id], onDelete: Cascade)
+}
+
+model UserAnswers {
+    id         String   @id @default(cuid())
+    userId     String
+    questionId String
+    answer     String
+    createdAt  DateTime @default(now())
+
+    question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Question {
+    id          String        @id @default(cuid())
+    name_textId      String
+    form        QuestionForm[]
+    UserAnswers UserAnswers[]
+}
+
+model QuestionForm {
+    id        String   @id @default(cuid())
+    question  Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+    form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+    questionId String
+    formId     String
+}
+
+model Form {
+    id          String     @id @default(cuid())
+    name_textId String
+    questions   QuestionForm[]
+}
