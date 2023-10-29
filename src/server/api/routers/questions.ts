@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import type { QuestionsAppView } from "../model/questionsAppView";
 
 export const questionRouter = createTRPCRouter({
   getQuestions: protectedProcedure
@@ -21,7 +20,7 @@ export const questionRouter = createTRPCRouter({
         },
       });
 
-      const lastQuestionId = await ctx.db.userAnswers.findMany({
+      const userAnswers = await ctx.db.userAnswers.findMany({
         where: {
           userId: ctx.session.user.id,
           questionId: {
@@ -29,46 +28,42 @@ export const questionRouter = createTRPCRouter({
           },
         },
         orderBy: {
-          createdAt: "desc",
+          id: "desc",
         },
-        take: 1,
       });
 
-      const questionsAppView = new Array<QuestionsAppView>(questions.length);
-
-      let i = 0;
-      for (const question of questions) {
-        const dbQuestion = await ctx.db.question.findFirstOrThrow({
-          where: {
-            id: question.questionId,
+      const translations = await ctx.db.textTranslation.findMany({
+        where: {
+          textId: {
+            in: questions.map((question) => question.question.question_textId),
           },
-        });
+          language: input.language,
+        },
+      });
 
-        const dbText = await ctx.db.text.findFirstOrThrow({
-          where: {
-            id: dbQuestion.question_textId,
-          },
-        });
-
-        const dbTextTranslation = await ctx.db.textTranslation.findFirstOrThrow(
-          {
-            where: {
-              textId: dbText.id,
-              language: input.language,
-            },
-          },
+      const questionsWithTranslation = questions.flatMap((question) => {
+        const translation = translations.find(
+          (translation) =>
+            translation.textId === question.question.question_textId,
         );
 
-        const questionAppView: QuestionsAppView = {
-          id: question.id,
-          text: dbTextTranslation.translation,
-          type: dbQuestion.answer_type,
+        const userAnswer = userAnswers.find(
+          (answer) => answer.questionId === question.questionId,
+        );
+
+        if (!translation) return [];
+        return {
+          id: question.questionId,
+          title: translation?.translation,
+          type: question.question.answer_type,
+          answer: userAnswer?.answer,
         };
+      });
 
-        questionsAppView[i++] = questionAppView;
-      }
-
-      return { questions, initialQuestionId: lastQuestionId[0]?.id };
+      return {
+        questions: questionsWithTranslation,
+        initialQuestionId: userAnswers[0]?.questionId,
+      };
     }),
   updateQuestion: protectedProcedure
     .input(
@@ -78,7 +73,7 @@ export const questionRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const question = await ctx.db.questionForm.findUnique({
+      const question = await ctx.db.question.findUnique({
         where: {
           id: input.questionId,
         },
@@ -86,23 +81,12 @@ export const questionRouter = createTRPCRouter({
       if (!question) {
         throw new Error("question not found");
       }
-      const user = await ctx.db.user.findUnique({
-        where: {
-          id: ctx.session.user.id,
-        },
-      });
-      if (!user) {
-        throw new Error("user not found");
-      }
-      if (!input.answer) {
-        throw new Error("answer not found");
-      }
 
       const answer = await ctx.db.userAnswers.create({
         data: {
           questionId: input.questionId,
           userId: ctx.session.user.id,
-          answer: input.answer,
+          answer: input.answer ?? "",
         },
       });
 

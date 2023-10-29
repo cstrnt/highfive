@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Button } from "./ui/button";
 import {
   Card,
@@ -29,7 +30,9 @@ export const SuccessCard = forwardRef<
         <p>Sie haben alle Fragen beantwortet.</p>
       </CardContent>
       <CardFooter className="flex justify-end">
-        <Button>Abschicken</Button>
+        <Link href="/app/home">
+          <Button>Abschicken</Button>
+        </Link>
       </CardFooter>
     </Card>
   );

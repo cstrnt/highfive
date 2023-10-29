@@ -14,8 +14,8 @@ export default async function QPage() {
 
   const { initialQuestionId, questions } =
     await api.question.getQuestions.query({
-      formId: "REPLACE_ME",
-      language: "en",
+      formId: "cloacz1jd0003mffgtq851ntn",
+      language: "de-DE",
     });
 
   if (questions.length === 0) {
@@ -30,7 +30,10 @@ export default async function QPage() {
         </Link>
         <h1 className="text-3xl font-bold">Residence Permit</h1>
       </nav>
-      <QuestionList questions={[]} initialQuestionId={initialQuestionId} />
+      <QuestionList
+        questions={questions}
+        initialQuestionId={initialQuestionId}
+      />
     </div>
   );
 }

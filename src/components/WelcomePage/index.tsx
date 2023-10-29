@@ -28,7 +28,7 @@ const WelcomeScreen = ({ onNext }: { onNext: () => void }) => {
         src={hiringImage}
         alt="hiring new people"
         quality={100}
-        className="w-10/12"
+        className="w-6/12"
       />
       <h1 className="text-4xl font-bold">Who are you?</h1>
       <svg
@@ -78,7 +78,7 @@ const LanguageScreen = ({ onNext }: { onNext: () => void }) => {
         you.
       </h3>
       <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-        <SelectTrigger className="border-primary my-11 w-[310px] rounded-2xl py-8 shadow-xl">
+        <SelectTrigger className="my-11 w-[310px] rounded-2xl border-primary py-8 shadow-xl">
           <SelectValue placeholder="Select your language" />
         </SelectTrigger>
         <SelectContent>
@@ -107,14 +107,14 @@ const LoginScreen = () => (
       width={99}
       height={102}
       quality={100}
-      className="mb-11"
+      className="mb-8"
     />
     <h1 className="text-2xl font-semibold">Getting started</h1>
-    <h3 className="text-muted-foreground mt-4">
+    <h3 className="mt-4 text-muted-foreground">
       Create an account to continue
     </h3>
 
-    <form className="mt-11 w-full space-y-3">
+    <form className="mt-8 w-full space-y-3">
       <Input
         placeholder="Email"
         type="email"
@@ -143,7 +143,7 @@ const LoginScreen = () => (
         <span className="w-full border-t"></span>
       </div>
       <div className="relative flex justify-center text-xs uppercase">
-        <span className="bg-background text-muted-foreground px-2">
+        <span className="bg-background px-2 text-muted-foreground">
           Or continue with
         </span>
       </div>
@@ -196,8 +196,8 @@ export default function WelcomePage({
   const canBack = currentPage !== "welcome";
 
   return (
-    <div className="flex flex-col items-center pt-6 text-center">
-      <nav className="flex w-full items-center justify-between">
+    <div className="relative flex flex-col items-center text-center">
+      <nav className="absolute flex w-full items-center justify-between">
         <Button
           variant="ghost"
           size="icon"
@@ -208,6 +208,7 @@ export default function WelcomePage({
           <ChevronLeft className="h-6 w-6" />
         </Button>
       </nav>
+
       {currentPage === "welcome" && (
         <WelcomeScreen onNext={() => onNext("language")} />
       )}

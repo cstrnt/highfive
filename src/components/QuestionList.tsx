@@ -1,33 +1,58 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { type Question } from "~/lib/types";
+import { useEffect, useRef, useState } from "react";
 import { QuestionComponent } from "./Question";
 import { api } from "~/trpc/react";
 import { SuccessCard } from "./SuccessCard";
 import confetti from "canvas-confetti";
+import { type inferProcedureOutput } from "@trpc/server";
+import { type AppRouter } from "~/server/api/root";
 
 export function QuestionList({
   questions,
   initialQuestionId,
 }: {
-  questions: Question[];
+  questions: inferProcedureOutput<
+    AppRouter["question"]["getQuestions"]
+  >["questions"];
   initialQuestionId?: string;
 }) {
   const successCardRef = useRef<HTMLDivElement>(null);
   const updateQuestion = api.question.updateQuestion.useMutation();
 
-  const questionStack = questions;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(
-    initialQuestionId
-      ? questionStack.findIndex((q) => q.id === initialQuestionId)
-      : 0,
+    () => {
+      const initialQuestionIndex = questions.findIndex(
+        (q) => q.id === initialQuestionId,
+      );
+
+      if (initialQuestionIndex === -1) return 0;
+      if (initialQuestionIndex > questions.length) return 0;
+      return initialQuestionIndex + 1;
+    },
   );
 
-  const showSuccessCard = currentQuestionIndex > questionStack.length - 1;
+  useEffect(() => {
+    if (!initialQuestionId) return;
+    const idx = questions.findIndex((q) => q.id === initialQuestionId);
+    const isLastQuestion = idx === questions.length - 1;
+    if (isLastQuestion) return;
+
+    const activeQuestion = document.getElementById(initialQuestionId);
+    if (!activeQuestion) return;
+
+    activeQuestion.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+      inline: "center",
+    });
+    setCurrentQuestionIndex(idx);
+  }, [initialQuestionId, questions]);
+
+  const showSuccessCard = currentQuestionIndex > questions.length - 1;
 
   const onSubmit = async (value: string | undefined, index: number) => {
-    const currentQuestion = questionStack.at(currentQuestionIndex);
+    const currentQuestion = questions.at(currentQuestionIndex);
     if (!currentQuestion) return;
 
     await updateQuestion.mutateAsync({
@@ -35,9 +60,9 @@ export function QuestionList({
       answer: value,
     });
 
-    const nextCard = questionStack.at(index + 1);
+    const nextCard = questions.at(index + 1);
 
-    if (index === questionStack.length - 1) {
+    if (index === questions.length - 1) {
       setCurrentQuestionIndex(index + 1);
       void confetti({
         particleCount: 100,
@@ -63,12 +88,13 @@ export function QuestionList({
       block: "center",
       inline: "center",
     });
+
     setCurrentQuestionIndex(index + 1);
   };
 
   return (
     <div className="space-y-8">
-      {questionStack.map((question, i) => (
+      {questions.map((question, i) => (
         <QuestionComponent
           key={question.id}
           question={question}
@@ -84,6 +110,7 @@ export function QuestionList({
             setCurrentQuestionIndex(i);
           }}
           isActive={i === currentQuestionIndex}
+          initialValue={question.answer}
         />
       ))}
 

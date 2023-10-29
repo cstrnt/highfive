@@ -28,17 +28,19 @@ export function QuestionComponent({
   onContinue,
   isActive,
   onCardClick,
+  initialValue,
 }: {
   question: Question;
   onContinue: (value: string | undefined) => void | Promise<void>;
   isActive: boolean;
   onCardClick?: (ref: RefObject<HTMLDivElement>) => void;
+  initialValue?: string;
 }) {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [value, setValue] = useState<Date | number | string | undefined>(
-    undefined,
+    initialValue,
   );
 
   const cardContent = () => {
@@ -69,7 +71,10 @@ export function QuestionComponent({
       }
       case "DATE": {
         return (
-          <DatePicker value={value as Date | undefined} onChange={setValue} />
+          <DatePicker
+            value={value ? new Date(value) : undefined}
+            onChange={setValue}
+          />
         );
       }
       case "BOOLEAN": {
@@ -89,8 +94,8 @@ export function QuestionComponent({
     setIsSubmitting(true);
     let stringifiedValue: string | undefined = undefined;
 
-    if (question.type === "DATE") {
-      stringifiedValue = (value as Date)?.toISOString();
+    if (question.type === "DATE" && value !== undefined) {
+      stringifiedValue = (value as Date).toISOString();
     } else {
       stringifiedValue = value !== undefined ? String(value) : undefined;
     }
@@ -140,7 +145,7 @@ export function QuestionComponent({
           className="text-base font-semibold"
         >
           {isSubmitting && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
-          Weiter
+          Continue
         </Button>
       </CardFooter>
     </Card>

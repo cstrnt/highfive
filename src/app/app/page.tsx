@@ -13,7 +13,7 @@ export default function OnboardingPage({
 
   return (
     <div className="container mx-auto min-h-screen">
-      <WelcomePage currentPage={currentPage} />;
+      <WelcomePage currentPage={currentPage} />
     </div>
   );
 }
