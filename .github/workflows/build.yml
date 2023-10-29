@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Git Checkout
       uses: actions/checkout@v3
+    - name: Set SKIP_ENV_VALIDATION env
+      run: export SKIP_ENV_VALIDATION=1
     - name: Use Node.js
       uses: actions/setup-node@v3
       with:
