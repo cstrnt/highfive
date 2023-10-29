@@ -14,8 +14,8 @@ export default async function QPage() {
 
   const { initialQuestionId, questions } =
     await api.question.getQuestions.query({
-      formId: "cloacz1jd0003mffgtq851ntn",
-      language: "de-DE",
+      // use the next i18n integration here in the future
+      language: "en-GB",
     });
 
   if (questions.length === 0) {

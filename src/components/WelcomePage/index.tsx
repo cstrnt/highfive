@@ -43,7 +43,7 @@ const WelcomeScreen = ({ onNext }: { onNext: () => void }) => {
           d="M1.99997 4.62713C48.7742 2.30373 163.417 -0.600504 247.794 6.36967"
           stroke="#EDA840"
           strokeWidth="3.27725"
-          stroke-linecap="round"
+          strokeLinecap="round"
         />
       </svg>
       <p className="mb-12 mt-4 max-w-xs">
@@ -83,8 +83,12 @@ const LanguageScreen = ({ onNext }: { onNext: () => void }) => {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="english">English</SelectItem>
-          <SelectItem value="german">German</SelectItem>
-          <SelectItem value="arabic">Arabic</SelectItem>
+          <SelectItem value="german" disabled>
+            German
+          </SelectItem>
+          <SelectItem value="arabic" disabled>
+            Arabic
+          </SelectItem>
         </SelectContent>
       </Select>
       <Button

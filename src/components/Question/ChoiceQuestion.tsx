@@ -34,6 +34,7 @@ export function ChoiceQuestion<
           htmlFor={`${question.id}-true`}
           className="flex h-full flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 text-center hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
         >
+          {/* TODO: use i18n here */}
           {question.trueText ?? "Yes"}
         </Label>
       </div>
@@ -47,6 +48,7 @@ export function ChoiceQuestion<
           htmlFor={`${question.id}-false`}
           className="flex h-full flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 text-center hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
         >
+          {/* TODO: use i18n here */}
           {question.falseText ?? "No"}
         </Label>
       </div>

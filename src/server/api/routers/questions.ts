@@ -6,17 +6,18 @@ export const questionRouter = createTRPCRouter({
   getQuestions: protectedProcedure
     .input(
       z.object({
-        formId: z.string(),
+        // omit for now since we only have one form
+        // formId: z.string(),
         language: z.string(),
       }),
     )
     .query(async ({ input, ctx }) => {
       const questions = await ctx.db.questionForm.findMany({
-        where: {
-          formId: input.formId,
-        },
         include: {
           question: true,
+        },
+        orderBy: {
+          id: "asc",
         },
       });
 
