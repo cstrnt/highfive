@@ -2,11 +2,22 @@
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
+## Prerequisites
+
+In order to run Highfive locally you will need the following tools
+
+- Node.js v20.9.0 (fnm / nvm is recommended)
+- pnpm v8.6.9
+- docker & docker-compose (or a local postgres)
+
 ## Getting Started
 
 `docker-compose up -d`
+
 `pnpm i`
+
 `pnpm db:push`
+
 `pnpm dev`
 
 ## What's next? How do I make an app with this?
