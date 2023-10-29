@@ -14,7 +14,7 @@ import {
 import { Input } from "../ui/input";
 import { ChoiceQuestion } from "./ChoiceQuestion";
 import { DatePicker } from "../DatePicker";
-import { QuestionType, type Question } from "~/lib/types";
+import { type Question } from "~/lib/types";
 import { QuestionMarkCircledIcon, ReloadIcon } from "@radix-ui/react-icons";
 import {
   TooltipProvider,
@@ -28,22 +28,24 @@ export function QuestionComponent({
   onContinue,
   isActive,
   onCardClick,
+  initialValue,
 }: {
   question: Question;
   onContinue: (value: string | undefined) => void | Promise<void>;
   isActive: boolean;
   onCardClick?: (ref: RefObject<HTMLDivElement>) => void;
+  initialValue?: string;
 }) {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [value, setValue] = useState<Date | number | string | undefined>(
-    undefined,
+    initialValue,
   );
 
   const cardContent = () => {
     switch (question.type) {
-      case QuestionType.Text: {
+      case "TEXT": {
         return (
           <Input
             type="text"
@@ -51,10 +53,11 @@ export function QuestionComponent({
             onChange={(e) => setValue(e.target.value)}
             minLength={question.minLength}
             maxLength={question.maxLength}
+            className="py-6"
           />
         );
       }
-      case QuestionType.Number: {
+      case "NUMBER": {
         return (
           <Input
             type="number"
@@ -62,15 +65,19 @@ export function QuestionComponent({
             onChange={(e) => setValue(e.target.valueAsNumber)}
             min={question.minValue}
             max={question.maxValue}
+            className="py-6"
           />
         );
       }
-      case QuestionType.Date: {
+      case "DATE": {
         return (
-          <DatePicker value={value as Date | undefined} onChange={setValue} />
+          <DatePicker
+            value={value ? new Date(value) : undefined}
+            onChange={setValue}
+          />
         );
       }
-      case QuestionType.Choice: {
+      case "BOOLEAN": {
         return (
           <ChoiceQuestion
             question={question}
@@ -87,8 +94,8 @@ export function QuestionComponent({
     setIsSubmitting(true);
     let stringifiedValue: string | undefined = undefined;
 
-    if (question.type === QuestionType.Date) {
-      stringifiedValue = (value as Date)?.toISOString();
+    if (question.type === "DATE" && value !== undefined) {
+      stringifiedValue = (value as Date).toISOString();
     } else {
       stringifiedValue = value !== undefined ? String(value) : undefined;
     }
@@ -100,7 +107,7 @@ export function QuestionComponent({
     <Card
       id={question.id}
       ref={cardRef}
-      className="relative max-w-lg transition duration-200 ease-in-out data-[active=false]:cursor-default data-[active=false]:opacity-30 data-[active=false]:shadow-none data-[active=false]:grayscale hover:data-[active=false]:opacity-60"
+      className="relative transition duration-200 ease-in-out data-[active=false]:cursor-default data-[active=false]:opacity-30 data-[active=false]:shadow-none data-[active=false]:grayscale hover:data-[active=false]:opacity-60"
       data-active={isActive}
       onClick={() => {
         if (onCardClick) onCardClick(cardRef);
@@ -112,7 +119,7 @@ export function QuestionComponent({
           {question.isRequired && <span className="text-primary">*</span>}
         </CardTitle>
         {question.helpText && (
-          <div className="text-muted-foreground absolute right-4 top-2">
+          <div className="absolute right-4 top-2 text-muted-foreground">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -120,7 +127,7 @@ export function QuestionComponent({
                 </TooltipTrigger>
                 <TooltipContent
                   side="bottom"
-                  className="bg-muted text-muted-foreground max-w-xs"
+                  className="max-w-xs bg-muted text-muted-foreground"
                 >
                   <p>{question.helpText}</p>
                 </TooltipContent>
@@ -132,9 +139,13 @@ export function QuestionComponent({
       </CardHeader>
       <CardContent>{cardContent()}</CardContent>
       <CardFooter className="flex justify-end">
-        <Button onClick={onContinueClick} disabled={isSubmitting}>
+        <Button
+          onClick={onContinueClick}
+          disabled={isSubmitting}
+          className="text-base font-semibold"
+        >
           {isSubmitting && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
-          Weiter
+          Continue
         </Button>
       </CardFooter>
     </Card>

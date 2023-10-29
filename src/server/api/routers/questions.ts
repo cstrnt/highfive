@@ -1,64 +1,94 @@
-import { Prisma, PrismaClient } from "@prisma/client";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const questionRouter = createTRPCRouter({
   getQuestions: protectedProcedure
-    .input(z.object({ formId: z.string(), userId: z.string(), language: z.string() }))
+    .input(
+      z.object({
+        formId: z.string(),
+        language: z.string(),
+      }),
+    )
     .query(async ({ input, ctx }) => {
-      // get questions from db for the given id (fragebogen id / formularId
-      // return questions
-
       const questions = await ctx.db.questionForm.findMany({
         where: {
-          formId: input.formId
+          formId: input.formId,
         },
-      })
-      const lastQuestionId = await ctx.db.userAnswers.findMany(
-        {
-          where: {
-            userId: input.userId, questionId: {
-              in: questions.map(question => question.questionId)
-            }
-          }
-        }
-      )
+        include: {
+          question: true,
+        },
+      });
 
-      return { questions, lastQuestionId };
+      const userAnswers = await ctx.db.userAnswers.findMany({
+        where: {
+          userId: ctx.session.user.id,
+          questionId: {
+            in: questions.map((question) => question.questionId),
+          },
+        },
+        orderBy: {
+          id: "desc",
+        },
+      });
+
+      const translations = await ctx.db.textTranslation.findMany({
+        where: {
+          textId: {
+            in: questions.map((question) => question.question.question_textId),
+          },
+          language: input.language,
+        },
+      });
+
+      const questionsWithTranslation = questions.flatMap((question) => {
+        const translation = translations.find(
+          (translation) =>
+            translation.textId === question.question.question_textId,
+        );
+
+        const userAnswer = userAnswers.find(
+          (answer) => answer.questionId === question.questionId,
+        );
+
+        if (!translation) return [];
+        return {
+          id: question.questionId,
+          title: translation?.translation,
+          type: question.question.answer_type,
+          answer: userAnswer?.answer,
+        };
+      });
+
+      return {
+        questions: questionsWithTranslation,
+        initialQuestionId: userAnswers[0]?.questionId,
+      };
     }),
   updateQuestion: protectedProcedure
-    .input(z.object({ questionId: z.string(), userId: z.string(), answer: z.string().optional() }))
+    .input(
+      z.object({
+        questionId: z.string(),
+        answer: z.string().optional(),
+      }),
+    )
     .mutation(async ({ input, ctx }) => {
-      
-      const question = await ctx.db.questionForm.findUnique({
+      const question = await ctx.db.question.findUnique({
         where: {
-          id: input.questionId
-        }
+          id: input.questionId,
+        },
       });
       if (!question) {
         throw new Error("question not found");
-      }
-      const user = await ctx.db.user.findUnique({
-        where: {
-          id: input.userId
-        }
-      });
-      if (!user) {
-        throw new Error("user not found");
-      }
-      if (!input.answer) {
-        throw new Error("answer not found");
       }
 
       const answer = await ctx.db.userAnswers.create({
         data: {
           questionId: input.questionId,
-          userId: input.userId,
-          answer: input.answer
-        }
+          userId: ctx.session.user.id,
+          answer: input.answer ?? "",
+        },
       });
-
 
       return { answer };
     }),

@@ -1,9 +1,4 @@
-export const enum QuestionType {
-  Text = "text",
-  Number = "number",
-  Date = "date",
-  Choice = "choice",
-}
+import { type QuestionType } from "@prisma/client";
 
 export type Question = {
   id: string;
@@ -15,24 +10,21 @@ export type Question = {
   type: QuestionType;
 } & (
   | {
-      type: QuestionType.Text;
+      type: (typeof QuestionType)["TEXT"];
       minLength?: number;
       maxLength?: number;
     }
   | {
-      type: QuestionType.Number;
+      type: (typeof QuestionType)["NUMBER"];
       minValue?: number;
       maxValue?: number;
     }
   | {
-      type: QuestionType.Date;
+      type: (typeof QuestionType)["DATE"];
     }
   | {
-      type: QuestionType.Choice;
-      choices: Array<{
-        label: string;
-        value: string;
-        icon?: React.ReactNode;
-      }>;
+      type: (typeof QuestionType)["BOOLEAN"];
+      trueText?: string;
+      falseText?: string;
     }
 );
