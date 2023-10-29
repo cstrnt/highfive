@@ -42,7 +42,7 @@ const WelcomeScreen = ({ onNext }: { onNext: () => void }) => {
         <path
           d="M1.99997 4.62713C48.7742 2.30373 163.417 -0.600504 247.794 6.36967"
           stroke="#EDA840"
-          stroke-width="3.27725"
+          strokeWidth="3.27725"
           stroke-linecap="round"
         />
       </svg>
